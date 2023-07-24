@@ -1,5 +1,5 @@
-import { useRef, useEffect } from 'react';
-import { m, useSpring, useTransform } from 'framer-motion';
+import { useRef, useEffect, MutableRefObject } from 'react';
+import { MotionValue, m, useSpring } from 'framer-motion';
 import normalizeWheel from 'normalize-wheel';
 import { useRafLoop } from 'react-use';
 import { useWindowSize } from '@react-hook/window-size';
@@ -11,9 +11,9 @@ const _ = {
 	wheelFactor: 1.8,
 };
 
-const MarqueeItem = ({ content, speed }) => {
-	const item = useRef(null);
-	const rect = useRef({});
+const MarqueeItem = ({ content, speed }: { content: string; speed: MotionValue }) => {
+	const item = useRef(null) as MutableRefObject<HTMLDivElement | null>;
+	const rect = useRef(null) as MutableRefObject<DOMRect | null>;
 	const x = useRef(0);
 
 	const [width, height] = useWindowSize();
@@ -27,6 +27,7 @@ const MarqueeItem = ({ content, speed }) => {
 	};
 
 	useEffect(() => {
+		if (!item.current) return;
 		rect.current = item.current.getBoundingClientRect();
 	}, [width, height]);
 
@@ -47,7 +48,7 @@ const MarqueeItem = ({ content, speed }) => {
 export const InteractiveMarquee = () => {
 	const marquee = useRef(null);
 	const slowDown = useRef(false);
-	const isScrolling = useRef(false);
+	const isScrolling = useRef(null);
 
 	const x = useRef(0);
 	const speed = useSpring(_.speed, {
